@@ -3,6 +3,8 @@
 import streamlit as st
 from datetime import datetime, timedelta
 from datetime import datetime
+import os
+
 
 def display_timetable():
     """시간표 전체를 화면에 표시하고 삭제 버튼 추가"""
@@ -54,6 +56,17 @@ def record_class_content():
         }
         st.session_state.class_contents.append(new_content)
         st.success("수업 내용이 저장되었습니다!")
+           # 파일에 저장 버튼 추가
+# ... (나머지 코드는 그대로 유지)
+
+def save_class_contents_to_txt():
+    """세션의 수업 내용을 txt 파일로 저장하는 함수"""
+    with open('class_contents.txt', 'w', encoding='utf-8') as file:
+        for item in st.session_state.class_contents:
+            file.write("수업 이름: " + item['subject'] + "\n")
+            file.write("날짜: " + item['date'] + "\n")
+            file.write("수업 내용:\n" + item['content'] + "\n")
+            file.write("-" * 50 + "\n")  # 구분선
 
 def view_class_content():
     """저장된 수업 내용을 보는 페이지"""
@@ -62,8 +75,18 @@ def view_class_content():
 
     for item in st.session_state.class_contents:
         if "{} - {}".format(item['subject'], item['date']) == selected:
+            st.write("수업 이름:", item['subject'])
             st.write("수업 내용:")
             st.write(item['content'])
+
+    # txt 파일로 저장하기 버튼 추가 (키 추가)
+    if st.button("txt 파일로 저장하기", key="save_to_txt"):
+        save_class_contents_to_txt()
+        st.success("class_contents.txt 파일로 저장되었습니다!")
+
+
+
+
 
 st.title("시간표 관리 웹사이트")
 
