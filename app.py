@@ -2,6 +2,7 @@
 
 import streamlit as st
 from datetime import datetime, timedelta
+from datetime import datetime
 
 def display_timetable():
     """시간표 전체를 화면에 표시하고 삭제 버튼 추가"""
@@ -39,15 +40,47 @@ def add_to_timetable():
         st.session_state.timetable.append(new_item)
         st.success("시간표에 추가되었습니다!")
 
+
+def record_class_content():
+    """수업 내용을 기록하는 페이지"""
+    subject_name = st.text_input("수업 과목")
+    class_content = st.text_area("수업내용")
+
+    if st.button("저장"):
+        new_content = {
+            'subject': subject_name,
+            'content': class_content,
+            'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        st.session_state.class_contents.append(new_content)
+        st.success("수업 내용이 저장되었습니다!")
+
+def view_class_content():
+    """저장된 수업 내용을 보는 페이지"""
+    subjects_with_date = ["{} - {}".format(item['subject'], item['date']) for item in st.session_state.class_contents]
+    selected = st.selectbox("수업과 날짜 선택", subjects_with_date)
+
+    for item in st.session_state.class_contents:
+        if "{} - {}".format(item['subject'], item['date']) == selected:
+            st.write("수업 내용:")
+            st.write(item['content'])
+
 st.title("시간표 관리 웹사이트")
 
-# 세션 상태에 timetable 초기화
+# 세션 상태에 timetable 및 class_contents 초기화
 if 'timetable' not in st.session_state:
     st.session_state.timetable = []
 
-menu = st.sidebar.radio("선택하세요", ["시간표 보기", "시간표에 추가하기"])
+if 'class_contents' not in st.session_state:
+    st.session_state.class_contents = []
+
+menu = st.sidebar.radio("선택하세요", ["시간표 보기", "시간표에 추가하기", "수업내용 기록", "수업내용 기록 보기"])
 
 if menu == "시간표 보기":
     display_timetable()
 elif menu == "시간표에 추가하기":
     add_to_timetable()
+elif menu == "수업내용 기록":
+    record_class_content()
+elif menu == "수업내용 기록 보기":
+    view_class_content()
